@@ -1,4 +1,4 @@
-name: Vercel Usage Monitor & WhatsApp Alert
+name: Vercel Usage Monitor & Alert
 
 on:
   schedule:
@@ -10,10 +10,9 @@ jobs:
   check-usage:
     runs-on: ubuntu-latest
     steps:
-      - name: Query Usage and Trigger Alert
+      - name: Query Usage and Trigger Discord Alert
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
-          WHATSAPP_API_KEY: ${{ secrets.WHATSAPP_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           curl -s -X GET "https://moviesnet.site/api/cron/check-usage?threshold=95" || true
