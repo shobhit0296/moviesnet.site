@@ -2,7 +2,7 @@
 // MoviesNet — Vercel Usage Monitor & Threshold Alerter (Discord + WhatsApp)
 // ============================================================================
 import { sendWhatsAppAlert } from './whatsapp-alert';
-import { sendDiscordAlert } from './discord-alert';
+import { sendDiscordAlert, createProgressBar } from './discord-alert';
 
 export interface VercelUsageReport {
   timestamp: string;
@@ -81,18 +81,18 @@ export async function checkVercelUsageAndAlert(thresholdPercent = 95, customWebh
       fields: [
         {
           name: '⚡ Serverless Invocations',
-          value: `${invocationsUsed.toLocaleString()} / 1,000,000 (${invocationsPct.toFixed(1)}%)`,
-          inline: true,
+          value: `${createProgressBar(invocationsPct)}\n↳ \`${invocationsUsed.toLocaleString()} / 1,000,000\``,
+          inline: false,
         },
         {
           name: '⏱️ Active CPU Time',
-          value: `${cpuHoursUsed.toFixed(2)}h / 4h (${cpuPct.toFixed(1)}%)`,
-          inline: true,
+          value: `${createProgressBar(cpuPct)}\n↳ \`${cpuHoursUsed.toFixed(2)}h / 4.00h\``,
+          inline: false,
         },
         {
           name: '🌐 Bandwidth Transfer',
-          value: `${bandwidthGbUsed.toFixed(2)} GB / 100 GB (${bandwidthPct.toFixed(1)}%)`,
-          inline: true,
+          value: `${createProgressBar(bandwidthPct)}\n↳ \`${bandwidthGbUsed.toFixed(2)} GB / 100 GB\``,
+          inline: false,
         },
         {
           name: '🛡️ Action Recommended',

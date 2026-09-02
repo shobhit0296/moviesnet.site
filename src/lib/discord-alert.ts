@@ -17,6 +17,14 @@ export interface DiscordAlertPayload {
   webhookUrl?: string;
 }
 
+export function createProgressBar(percent: number | string, length = 10): string {
+  const clamped = Math.max(0, Math.min(100, Number(percent)));
+  const filledCount = Math.round((clamped / 100) * length);
+  const emptyCount = length - filledCount;
+  const bar = '█'.repeat(filledCount) + '░'.repeat(emptyCount);
+  return `\`[${bar}]\` **${clamped.toFixed(2)}% / 100%**`;
+}
+
 /**
  * Sends a rich Discord embed notification to a configured Webhook.
  */
