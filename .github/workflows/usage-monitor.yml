@@ -10,9 +10,9 @@ jobs:
   check-usage:
     runs-on: ubuntu-latest
     steps:
-      - name: Query Usage and Trigger Discord Alert
+      - name: Query Usage and Trigger Milestone Alerts
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          curl -s -X GET "https://moviesnet.site/api/cron/check-usage?threshold=95" || true
+          curl -s -X GET "https://moviesnet.site/api/cron/check-usage?threshold=25" || true

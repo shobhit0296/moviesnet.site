@@ -1,5 +1,5 @@
 // ============================================================================
-// MoviesNet — Vercel Usage Monitor & Threshold Alerter (Discord + WhatsApp)
+// MoviesNet & AllSiteHub — Multi-Tier Vercel Usage Milestone Monitor
 // ============================================================================
 import { sendWhatsAppAlert } from './whatsapp-alert';
 import { sendDiscordAlert, createProgressBar } from './discord-alert';
@@ -7,6 +7,7 @@ import { sendDiscordAlert, createProgressBar } from './discord-alert';
 export interface VercelUsageReport {
   timestamp: string;
   isAboveThreshold: boolean;
+  milestoneTriggered: number | null; // 25, 50, 75, or 95
   highestPercentage: number;
   metrics: {
     invocations: { used: number; limit: number; percentage: number };
@@ -27,10 +28,50 @@ const VERCEL_LIMITS = {
   BANDWIDTH_GB: 100,
 };
 
+function getMilestoneConfig(percent: number) {
+  if (percent >= 95) {
+    return {
+      tier: 95,
+      title: '🔴 CRITICAL: Vercel Usage Reached 95%+',
+      color: 0xef4444, // Bright Red
+      severity: 'CRITICAL',
+      action: 'Check Cloudflare Cache Shield & Bot Fight Mode immediately to prevent free tier pause.',
+    };
+  }
+  if (percent >= 75) {
+    return {
+      tier: 75,
+      title: '🟠 WARNING: Vercel Usage Reached 75%',
+      color: 0xf97316, // Orange
+      severity: 'HIGH',
+      action: 'Verify Cloudflare edge caching is active to keep remaining 25% buffer healthy.',
+    };
+  }
+  if (percent >= 50) {
+    return {
+      tier: 50,
+      title: '🟡 NOTICE: Vercel Usage Reached 50% (Halfway)',
+      color: 0xeab308, // Yellow
+      severity: 'MEDIUM',
+      action: 'Normal active growth. CDN edge caching is absorbing repeat traffic.',
+    };
+  }
+  if (percent >= 25) {
+    return {
+      tier: 25,
+      title: '🔵 INFO: Vercel Usage Reached 25%',
+      color: 0x3b82f6, // Blue
+      severity: 'LOW',
+      action: 'First quarter usage milestone reached. Systems running smoothly.',
+    };
+  }
+  return null;
+}
+
 /**
- * Checks Vercel project usage and triggers Discord/WhatsApp alerts if usage exceeds threshold (e.g. 95%).
+ * Checks Vercel project usage and triggers multi-tier milestone alerts (25%, 50%, 75%, 95%).
  */
-export async function checkVercelUsageAndAlert(thresholdPercent = 95, customWebhook?: string): Promise<VercelUsageReport> {
+export async function checkVercelUsageAndAlert(thresholdPercent = 25, customWebhook?: string): Promise<VercelUsageReport> {
   const token = process.env.VERCEL_TOKEN || '';
   const teamId = process.env.VERCEL_TEAM_ID || 'team_DeEdnXuKp67XBdCRPTZxsELt';
 
@@ -64,6 +105,7 @@ export async function checkVercelUsageAndAlert(thresholdPercent = 95, customWebh
   const bandwidthPct = (bandwidthGbUsed / VERCEL_LIMITS.BANDWIDTH_GB) * 100;
 
   const highestPercentage = Math.max(invocationsPct, cpuPct, bandwidthPct);
+  const milestone = getMilestoneConfig(highestPercentage);
   const isAboveThreshold = highestPercentage >= thresholdPercent;
 
   let discordSent = false;
@@ -71,32 +113,40 @@ export async function checkVercelUsageAndAlert(thresholdPercent = 95, customWebh
   let alertError: string | undefined;
 
   if (isAboveThreshold || customWebhook) {
+    const config = milestone || {
+      tier: thresholdPercent,
+      title: `📊 Vercel Usage Status Report (${highestPercentage.toFixed(1)}%)`,
+      color: 0x10b981, // Green
+      severity: 'NORMAL',
+      action: 'All systems operating well below limits.',
+    };
+
     // 1. Send Rich Discord Alert
     const discordRes = await sendDiscordAlert({
       webhookUrl: customWebhook,
-      title: '🚨 VERCEL USAGE CRITICAL ALERT (95%+)',
-      description: `Your MoviesNet Vercel usage has reached **${highestPercentage.toFixed(1)}%** of your Free Tier capacity.`,
-      color: 0xff2a48, // Crimson red
+      title: config.title,
+      description: `Target Sites: **MoviesNet** (\`moviesnet.site\`) & **AllSiteHub** (\`allsitehub\`)\n\nCurrent Highest Usage Metric: **${highestPercentage.toFixed(2)}% / 100%**`,
+      color: config.color,
       url: 'https://vercel.com/venomm1/moviesnet-site',
       fields: [
         {
-          name: '⚡ Serverless Invocations',
-          value: `${createProgressBar(invocationsPct)}\n↳ \`${invocationsUsed.toLocaleString()} / 1,000,000\``,
+          name: '⚡ Serverless Function Invocations',
+          value: `${createProgressBar(invocationsPct)}\n↳ \`${invocationsUsed.toLocaleString()} / 1,000,000 limit\``,
           inline: false,
         },
         {
-          name: '⏱️ Active CPU Time',
-          value: `${createProgressBar(cpuPct)}\n↳ \`${cpuHoursUsed.toFixed(2)}h / 4.00h\``,
+          name: '⏱️ Active CPU Compute Time',
+          value: `${createProgressBar(cpuPct)}\n↳ \`${cpuHoursUsed.toFixed(2)}h / 4.00 Hours limit\``,
           inline: false,
         },
         {
-          name: '🌐 Bandwidth Transfer',
-          value: `${createProgressBar(bandwidthPct)}\n↳ \`${bandwidthGbUsed.toFixed(2)} GB / 100 GB\``,
+          name: '🌐 Data Transfer (Bandwidth)',
+          value: `${createProgressBar(bandwidthPct)}\n↳ \`${bandwidthGbUsed.toFixed(2)} GB / 100 GB limit\``,
           inline: false,
         },
         {
-          name: '🛡️ Action Recommended',
-          value: 'Check Cloudflare Cache Shield & Bot Fight Mode are active to absorb incoming requests.',
+          name: '🛡️ Status & Recommendation',
+          value: `**[${config.severity}]** ${config.action}`,
           inline: false,
         },
       ],
@@ -105,21 +155,24 @@ export async function checkVercelUsageAndAlert(thresholdPercent = 95, customWebh
     if (!discordRes.success) alertError = discordRes.error;
 
     // 2. Send WhatsApp Alert if configured
-    const whatsappMsg =
-      `🚨 *MOVIESNET VERCEL USAGE ALERT* 🚨\n\n` +
-      `Usage reached *${highestPercentage.toFixed(1)}%*.\n` +
-      `• Invocations: ${invocationsUsed.toLocaleString()} / 1M (${invocationsPct.toFixed(1)}%)\n` +
-      `• CPU Time: ${cpuHoursUsed.toFixed(2)}h / 4h (${cpuPct.toFixed(1)}%)\n` +
-      `• Bandwidth: ${bandwidthGbUsed.toFixed(2)} GB / 100 GB\n\n` +
-      `Dashboard: https://vercel.com/venomm1/moviesnet-site`;
+    if (highestPercentage >= 50) {
+      const whatsappMsg =
+        `📊 *VERCEL USAGE MILESTONE ALERT*\n\n` +
+        `Current Usage: *${highestPercentage.toFixed(1)}%*\n` +
+        `• Functions: ${invocationsUsed.toLocaleString()} / 1M (${invocationsPct.toFixed(1)}%)\n` +
+        `• CPU: ${cpuHoursUsed.toFixed(2)}h / 4h (${cpuPct.toFixed(1)}%)\n` +
+        `• Bandwidth: ${bandwidthGbUsed.toFixed(2)} GB / 100 GB\n\n` +
+        `Dashboard: https://vercel.com/venomm1/moviesnet-site`;
 
-    const waRes = await sendWhatsAppAlert(whatsappMsg);
-    whatsappSent = waRes.success;
+      const waRes = await sendWhatsAppAlert(whatsappMsg);
+      whatsappSent = waRes.success;
+    }
   }
 
   return {
     timestamp: new Date().toISOString(),
     isAboveThreshold,
+    milestoneTriggered: milestone?.tier || null,
     highestPercentage,
     metrics: {
       invocations: { used: invocationsUsed, limit: VERCEL_LIMITS.INVOCATIONS, percentage: invocationsPct },
