@@ -12,6 +12,10 @@ export async function GET() {
       picks,
       totalSites: websites.length,
       timestamp: new Date().toISOString(),
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=1800, s-maxage=3600, stale-while-revalidate=86400',
+      },
     });
   } catch {
     return NextResponse.json({ picks: [], totalSites: 0 }, { status: 200 });

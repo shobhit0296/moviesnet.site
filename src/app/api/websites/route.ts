@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
   const websites = getWebsites().sort((a, b) => b.priority - a.priority);
 
   if (isAdmin) {
-    return NextResponse.json(websites);
+    return NextResponse.json(websites, {
+      headers: { 'Cache-Control': 'private, no-cache, no-store' },
+    });
   }
 
   // Public view: AllSiteHub directory only (FMHY catalog stays in admin backend)
@@ -35,7 +37,11 @@ export async function GET(request: NextRequest) {
       tags: (w as unknown as { tags?: string[] }).tags || [],
     }));
 
-  return NextResponse.json(publicWebsites);
+  return NextResponse.json(publicWebsites, {
+    headers: {
+      'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+    },
+  });
 }
 
 // POST /api/websites — Create a website (admin only)

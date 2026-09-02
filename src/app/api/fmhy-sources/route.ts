@@ -30,6 +30,8 @@ export async function GET(request: NextRequest) {
     total: sources.length,
     publishedCount: sources.filter((s) => s.published).length,
     sections,
+  }, {
+    headers: { 'Cache-Control': 'private, no-cache, no-store' },
   });
 }
 

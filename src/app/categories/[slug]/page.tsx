@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import CategoryPageClient from './CategoryPageClient';
 import { absoluteUrl } from '@/lib/seo';
 
+export const revalidate = 86400;
+
 export function generateStaticParams() {
   return CATEGORIES.map((cat) => ({ slug: cat.slug }));
 }

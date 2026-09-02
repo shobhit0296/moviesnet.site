@@ -16,5 +16,9 @@ export async function GET() {
     source: 'imdb-moviemeter-daily',
     refreshHours: 4,
     timestamp: new Date().toISOString(),
+  }, {
+    headers: {
+      'Cache-Control': 'public, max-age=3600, s-maxage=14400, stale-while-revalidate=86400',
+    },
   });
 }

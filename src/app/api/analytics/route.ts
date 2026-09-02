@@ -82,7 +82,9 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(stats);
+    return NextResponse.json(stats, {
+      headers: { 'Cache-Control': 'private, no-cache, no-store' },
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
   }

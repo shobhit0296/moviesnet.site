@@ -46,7 +46,9 @@ export async function GET(request: NextRequest) {
   if (!(await requireAdmin(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return NextResponse.json(getSiteRequests());
+  return NextResponse.json(getSiteRequests(), {
+    headers: { 'Cache-Control': 'private, no-cache, no-store' },
+  });
 }
 
 // POST — public submit OR admin approve action via body.action

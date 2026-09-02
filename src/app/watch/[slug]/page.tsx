@@ -10,6 +10,8 @@ import {
 } from '@/lib/seo';
 import { JsonLd } from '@/components/seo/JsonLd';
 
+export const revalidate = 86400;
+
 export function generateStaticParams() {
   return SEO_TITLES.map((entry) => ({ slug: entry.slug }));
 }

@@ -14,6 +14,10 @@ export async function GET() {
       today,
       week,
       month,
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=1800, s-maxage=3600, stale-while-revalidate=86400',
+      },
     });
   } catch (error) {
     return NextResponse.json({ today: [], week: [], month: [] }, { status: 500 });

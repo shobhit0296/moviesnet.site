@@ -112,7 +112,11 @@ export async function GET(request: NextRequest) {
       cache.set(cacheKey, ranked, 5 * 60 * 1000);
     }
 
-    return NextResponse.json({ suggestions: ranked });
+    return NextResponse.json({ suggestions: ranked }, {
+      headers: {
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+      },
+    });
   } catch (error) {
     console.error('Suggestions API error:', error);
     return NextResponse.json({ suggestions: [] });
