@@ -165,7 +165,7 @@ export function Header() {
                     (item.href !== '/' && pathname?.startsWith(item.href!));
 
                   return (
-                    <Link
+                    <Link prefetch={false}
                       key={item.href}
                       href={item.href!}
                       className={cn(
@@ -346,7 +346,7 @@ export function Header() {
 
                   const isActive = pathname === item.href;
                   return (
-                    <Link
+                    <Link prefetch={false}
                       key={item.href}
                       href={item.href!}
                       className={cn(

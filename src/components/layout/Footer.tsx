@@ -27,7 +27,7 @@ export function Footer() {
             <ul className="space-y-3">
               {CATEGORIES.map((cat) => (
                 <li key={cat.slug}>
-                  <Link
+                  <Link prefetch={false}
                     href={`/categories/${cat.slug}`}
                     className="text-sm text-white/40 hover:text-white/80 transition-colors flex items-center gap-2"
                   >
@@ -50,7 +50,7 @@ export function Footer() {
                 { href: '/websites', label: 'Websites' },
               ].map((link) => (
                 <li key={link.href}>
-                  <Link
+                  <Link prefetch={false}
                     href={link.href}
                     className="text-sm text-white/40 hover:text-white/80 transition-colors"
                   >
@@ -67,7 +67,7 @@ export function Footer() {
             <ul className="space-y-3">
               {SEO_TITLES.slice(0, 8).map((entry) => (
                 <li key={entry.slug}>
-                  <Link
+                  <Link prefetch={false}
                     href={`/watch/${entry.slug}`}
                     className="text-sm text-white/40 hover:text-white/80 transition-colors"
                   >
