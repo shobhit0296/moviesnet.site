@@ -6,6 +6,11 @@ export const SITE_TAGLINE = 'Search Once. Find Everywhere.';
 
 export const DEFAULT_KEYWORDS = [
   'moviesnet',
+  'moviesnet.site',
+  'moviesnet site',
+  'movies net',
+  'MoviesNet',
+  'Movies Net',
   'movie search engine',
   'where to watch movies',
   'where to watch tv shows',
@@ -35,11 +40,10 @@ export function buildRootMetadata(): Metadata {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+      default: `${SITE_NAME} (moviesnet.site) — ${SITE_TAGLINE} | Movie & Anime Search Engine`,
       template: `%s | ${SITE_NAME}`,
     },
-    description:
-      'MoviesNet helps you find movies, TV shows, anime, manga, sports, and live TV across curated streaming portals in one search. Discover titles instantly and open the original source.',
+    description: 'MoviesNet (moviesnet) is the unified streaming search engine to find movies, TV shows, anime, and sports across verified portals on moviesnet.site.',
     keywords: DEFAULT_KEYWORDS,
     applicationName: SITE_NAME,
     authors: [{ name: SITE_NAME, url: SITE_URL }],
@@ -182,6 +186,7 @@ export function websiteJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
+    alternateName: ['moviesnet', 'moviesnet.site', 'MoviesNet', 'movies net', 'Movies Net'],
     url: SITE_URL,
     description: 'Unified movie, TV, anime, and live stream discovery search engine.',
     potentialAction: {
