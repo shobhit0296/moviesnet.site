@@ -3,6 +3,7 @@ import { Syne, Instrument_Sans, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { Header } from '@/components/layout/Header';
+import TopSupportBanner from '@/components/TopSupportBanner';
 import { Footer } from '@/components/layout/Footer';
 import { ThemeContainer } from '@/components/effects/ThemeContainer';
 import { GoogleAnalytics } from '@/components/seo/GoogleAnalytics';
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <ThemeContainer />
           <div className="relative z-10 flex flex-col min-h-screen">
+            <TopSupportBanner />
             <Header />
             <main className="flex-1 pt-[var(--header-height)]">{children}</main>
             <Footer />

@@ -48,6 +48,8 @@ export function Footer() {
                 { href: '/trending', label: 'Trending' },
                 { href: '/themes', label: 'Themes' },
                 { href: '/websites', label: 'Websites' },
+                { href: '/support', label: 'Support' },
+                { href: '/benefits', label: 'Supporter Perks' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link prefetch={false}

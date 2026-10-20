@@ -36,6 +36,7 @@ export function Header() {
     { href: '/search', label: 'Search' },
     { isAction: true, action: () => setRequestModalOpen(true), label: 'Request Site' },
     { href: '/websites', label: 'Websites' },
+    { href: '/support', label: 'Support' },
   ];
 
   // Keyboard shortcut listener for Cmd+K / Ctrl+K
