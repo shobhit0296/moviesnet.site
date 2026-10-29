@@ -32,7 +32,11 @@ export function absoluteUrl(path = ''): string {
 }
 
 export function buildRootMetadata(): Metadata {
-  const verification: Metadata['verification'] = {};
+  const verification: Metadata['verification'] = {
+    other: {
+      'profiton-domain-verification': '7573d1bb564a9c711068e99daebd1cb3e6354578d59ec8f415f1dede6d3330ee',
+    },
+  };
   if (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION) {
     verification.google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
   }
@@ -97,6 +101,11 @@ export function buildHomeMetadata(): Metadata {
     description:
       'Find where to watch any movie, TV series, or anime. MoviesNet searches your curated streaming directory and ranks the fastest sites for every title.',
     alternates: { canonical: SITE_URL },
+    verification: {
+      other: {
+        'profiton-domain-verification': '7573d1bb564a9c711068e99daebd1cb3e6354578d59ec8f415f1dede6d3330ee',
+      },
+    },
     openGraph: {
       url: SITE_URL,
       title: `${SITE_NAME} — Search Movies, TV Shows & Anime`,

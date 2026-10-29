@@ -50,11 +50,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${syne.variable} ${instrumentSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <meta
+          name="profiton-domain-verification"
+          content="7573d1bb564a9c711068e99daebd1cb3e6354578d59ec8f415f1dede6d3330ee"
+        />
+        <meta
+          name="profiton-check"
+          content="0a15b0475ab2a6a132078d67b4e0952f"
+        />
         <JsonLd
           data={[organizationJsonLd(), websiteJsonLd(), softwareApplicationJsonLd()]}
         />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#03050a] text-white font-sans">
+        <div style={{ display: 'none' }} aria-hidden="true">
+          Profiton check: 0a15b0475ab2a6a132078d67b4e0952f
+        </div>
         <GoogleAnalytics />
         <Providers>
           <ThemeContainer />
